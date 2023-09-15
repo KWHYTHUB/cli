@@ -85,16 +85,16 @@ impl OldConfig {
 	}
 }
 
-pub fn geode_root() -> PathBuf {
+pub fn _root() -> PathBuf {
 	// get data dir per-platform
 	let data_dir: PathBuf;
 	#[cfg(any(windows, target_os = "linux"))]
 	{
-		data_dir = dirs::data_local_dir().unwrap().join("Geode");
+		data_dir = dirs::data_local_dir().unwrap().join("Sapphire");
 	};
 	#[cfg(target_os = "macos")]
 	{
-		data_dir = PathBuf::from("/Users/Shared/Geode");
+		data_dir = PathBuf::from("/Users/Shared/Sapphire");
 	};
 	#[cfg(not(any(windows, target_os = "macos", target_os = "linux")))]
 	{
@@ -129,20 +129,20 @@ impl Profile {
 		}
 	}
 
-	pub fn geode_dir(&self) -> PathBuf {
+	pub fn _dir(&self) -> PathBuf {
 		if cfg!(windows) {
-			self.gd_path.parent().unwrap().join("geode")
+			self.gd_path.parent().unwrap().join("")
 		} else {
-			self.gd_path.join("Contents/geode")
+			self.gd_path.join("Contents/")
 		}
 	}
 
 	pub fn index_dir(&self) -> PathBuf {
-		self.geode_dir().join("index")
+		self._dir().join("index")
 	}
 
 	pub fn mods_dir(&self) -> PathBuf {
-		self.geode_dir().join("mods")
+		self._dir().join("mods")
 	}
 }
 
@@ -163,28 +163,28 @@ impl Config {
 	}
 
 	pub fn try_sdk_path() -> Result<PathBuf, String> {
-		let sdk_var = std::env::var("GEODE_SDK")
+		let sdk_var = std::env::var("SAPPHIRE_SDK")
 			.map_err(|_|
-				"Unable to find Geode SDK (GEODE_SDK isn't set). Please install \
-				it using `geode sdk install` or use `geode sdk set-path` to set \
+				"Unable to find Sapphire SDK (SAPPHIRE_SDK isn't set). Please install \
+				it using ` sdk install` or use ` sdk set-path` to set \
 				it to an existing clone. If you just installed the SDK using \
-				`geode sdk install`, please restart your terminal / computer to \
+				` sdk install`, please restart your terminal / computer to \
 				apply changes."
 			)?;
 	
 		let path = PathBuf::from(sdk_var);
 		if !path.is_dir() {
 			return Err(format!(
-				"Internal Error: GEODE_SDK doesn't point to a directory ({}). This \
-				might be caused by having run `geode sdk set-path` - try restarting \
-				your terminal / computer, or reinstall using `geode sdk install --reinstall`",
+				"Internal Error: SAPPHIRE_SDK doesn't point to a directory ({}). This \
+				might be caused by having run ` sdk set-path` - try restarting \
+				your terminal / computer, or reinstall using ` sdk install --reinstall`",
 				path.display()
 			));
 		}
 		if !path.join("VERSION").exists() {
 			return Err(
-				"Internal Error: GEODE_SDK/VERSION not found. Please reinstall \
-				the Geode SDK using `geode sdk install --reinstall`".into()
+				"Internal Error: SAPPHIRE_SDK/VERSION not found. Please reinstall \
+				the Sapphire SDK using ` sdk install --reinstall`".into()
 			);
 		}
 	
@@ -196,9 +196,9 @@ impl Config {
 	}
 
 	pub fn new() -> Config {
-		if !geode_root().exists() {
-			warn!("It seems you don't have Geode installed. Some operations will not work");
-			warn!("You can setup Geode using `geode config setup`");
+		if !_root().exists() {
+			warn!("It seems you don't have Sapphire installed. Some operations will not work");
+			warn!("You can setup Sapphire using ` config setup`");
 
 			return Config {
 				current_profile: None,
@@ -209,10 +209,10 @@ impl Config {
 			};
 		}
 
-		let config_json = geode_root().join("config.json");
+		let config_json = _root().join("config.json");
 
 		let mut output: Config = if !config_json.exists() {
-			info!("Setup Geode using `geode config setup`");
+			info!("Setup Sapphire using ` config setup`");
 			// Create new config
 			Config {
 				current_profile: None,
@@ -242,8 +242,8 @@ impl Config {
 		output.save();
 
 		if output.profiles.is_empty() {
-			warn!("No Geode profiles found! Some operations will be unavailable.");
-			warn!("Setup Geode using `geode config setup`");
+			warn!("No Sapphire profiles found! Some operations will be unavailable.");
+			warn!("Setup Sapphire using ` config setup`");
 		} else if output.get_profile(&output.current_profile).is_none() {
 			output.current_profile = Some(output.profiles[0].borrow().name.clone());
 		}
@@ -252,9 +252,9 @@ impl Config {
 	}
 
 	pub fn save(&self) {
-		std::fs::create_dir_all(geode_root()).nice_unwrap("Unable to create Geode directory");
+		std::fs::create_dir_all(_root()).nice_unwrap("Unable to create Sapphire directory");
 		std::fs::write(
-			geode_root().join("config.json"),
+			_root().join("config.json"),
 			serde_json::to_string(self).unwrap(),
 		)
 		.nice_unwrap("Unable to save config");

@@ -15,35 +15,35 @@ mod project;
 
 use util::*;
 
-/// Command-line interface for Geode
+/// Command-line interface for Sapphire
 #[derive(Parser, Debug)]
 #[clap(version)]
 struct Args {
 	#[clap(subcommand)]
-	command: GeodeCommands,
+	command: SapphireCommands,
 }
 
 #[derive(Subcommand, Debug)]
-enum GeodeCommands {
-	/// Initialize a new Geode project
+enum SapphireCommands {
+	/// Initialize a new Sapphire project
 	New {
 		/// The target directory to create the project in
 		path: Option<PathBuf>
 	},
 
-	/// Options for managing profiles (installations of Geode)
+	/// Options for managing profiles (installations of Sapphire)
 	Profile {
 		#[clap(subcommand)]
 		commands: crate::profile::Profile,
 	},
 
-	/// Options for configuring Geode CLI
+	/// Options for configuring Sapphire CLI
 	Config {
 		#[clap(subcommand)]
 		commands: crate::info::Info,
 	},
 
-	/// Options for installing & managing the Geode SDK
+	/// Options for installing & managing the Sapphire SDK
 	Sdk {
 		#[clap(subcommand)]
 		commands: crate::sdk::Sdk,
@@ -55,13 +55,13 @@ enum GeodeCommands {
 		commands: crate::project::Project,
 	},
 
-	/// Options for working with .geode packages
+	/// Options for working with . packages
 	Package {
 		#[clap(subcommand)]
 		commands: crate::package::Package,
 	},
 
-	/// Tools for interacting with the Geode mod index
+	/// Tools for interacting with the Sapphire mod index
 	Index {
 		#[clap(subcommand)]
 		commands: crate::index::Index,
@@ -87,14 +87,14 @@ fn main() {
 	let mut config = config::Config::new();
 
 	match args.command {
-		GeodeCommands::New { path } => template::build_template(&mut config, path),
-		GeodeCommands::Profile { commands } => profile::subcommand(&mut config, commands),
-		GeodeCommands::Config { commands } => info::subcommand(&mut config, commands),
-		GeodeCommands::Sdk { commands } => sdk::subcommand(&mut config, commands),
-		GeodeCommands::Package { commands } => package::subcommand(&mut config, commands),
-		GeodeCommands::Project { commands } => project::subcommand(&mut config, commands),
-		GeodeCommands::Index { commands } => index::subcommand(&mut config, commands),
-		GeodeCommands::Run { background } => profile::run_profile(&config, None, background)
+		SapphireCommands::New { path } => template::build_template(&mut config, path),
+		SapphireCommands::Profile { commands } => profile::subcommand(&mut config, commands),
+		SapphireCommands::Config { commands } => info::subcommand(&mut config, commands),
+		SapphireCommands::Sdk { commands } => sdk::subcommand(&mut config, commands),
+		SapphireCommands::Package { commands } => package::subcommand(&mut config, commands),
+		SapphireCommands::Project { commands } => project::subcommand(&mut config, commands),
+		SapphireCommands::Index { commands } => index::subcommand(&mut config, commands),
+		SapphireCommands::Run { background } => profile::run_profile(&config, None, background)
 	}
 
 	config.save();

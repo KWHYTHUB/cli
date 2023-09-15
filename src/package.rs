@@ -18,13 +18,13 @@ use crate::{done, info, warn, fatal, NiceUnwrap};
 #[derive(Subcommand, Debug)]
 #[clap(rename_all = "kebab-case")]
 pub enum Package {
-	/// Install a .geode package to the current profile
+	/// Install a . package to the current profile
 	Install {
-		/// Location of the .geode package to install
+		/// Location of the . package to install
 		path: PathBuf,
 	},
 
-	/// Create a .geode package
+	/// Create a . package
 	New {
 		/// Location of mod's folder
 		root_path: PathBuf,
@@ -36,7 +36,7 @@ pub enum Package {
 		binary: Vec<PathBuf>,
 
 		/// Location of output file. If not provided, the resulting file is named 
-		/// {mod.id}.geode and placed at the root path
+		/// {mod.id}. and placed at the root path
 		#[clap(short, long)]
 		output: Option<PathBuf>,
 
@@ -52,7 +52,7 @@ pub enum Package {
 	},
 
 	/// Check the dependencies of a project. 
-	/// Currently just an alias for `geode project check`, will be removed in 
+	/// Currently just an alias for ` project check`, will be removed in 
 	/// CLI v3.0.0!
 	#[deprecated(since = "v2.0.0", note = "Will be removed in v3.0.0")]
 	Setup {
@@ -142,7 +142,7 @@ fn zip_folder(path: &Path, output: &Path) {
 }
 
 pub fn get_working_dir(id: &String) -> PathBuf {
-	let working_dir = dirs::cache_dir().unwrap().join(format!("geode_pkg_{}", id));
+	let working_dir = dirs::cache_dir().unwrap().join(format!("_pkg_{}", id));
 	fs::remove_dir_all(&working_dir).unwrap_or(());
 	fs::create_dir(&working_dir).unwrap_or(());
 	working_dir
@@ -264,12 +264,12 @@ fn create_package(
 	// Parse mod.json
 	let mod_file_info = parse_mod_info(root_path);
 
-	let mut output = raw_output.unwrap_or(root_path.join(format!("{}.geode", mod_file_info.id)));
+	let mut output = raw_output.unwrap_or(root_path.join(format!("{}.", mod_file_info.id)));
 
 	// If it's a directory, add file path to it
 	if output.is_dir() {
 		output.push(&mod_file_info.id);
-		output.set_extension("geode");
+		output.set_extension("");
 		warn!(
 			"Specified output is a directory. Creating package at {}",
 			output.display()

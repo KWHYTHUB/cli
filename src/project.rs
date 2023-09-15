@@ -10,7 +10,7 @@ use crate::util::mod_file::DependencyImportance;
 #[derive(Subcommand, Debug)]
 #[clap(rename_all = "kebab-case")]
 pub enum Project {
-	/// Initialize a new Geode project (same as `geode new`)
+	/// Initialize a new Sapphire project (same as ` new`)
     New {
 		/// The target directory to create the project in
 		path: Option<PathBuf>
@@ -22,7 +22,7 @@ pub enum Project {
 	/// Check & install the dependencies for this project 
 	Check {
 		/// Where to install the dependencies; usually the project's build 
-        /// directory. A directory called geode-deps will be created inside 
+        /// directory. A directory called -deps will be created inside 
         /// the specified installation directory. If not specified, "build" 
         /// is assumed
 		install_dir: Option<PathBuf>,
@@ -39,9 +39,9 @@ pub enum Project {
 		dont_update_index: bool,
 	},
 
-    /// Publish this project on the Geode mods index
+    /// Publish this project on the Sapphire mods index
     Publish {
-        /// Path to the project's built .geode file. If you are using Geode 
+        /// Path to the project's built . file. If you are using Sapphire 
         /// v1.0.0-beta.8 or newer, CLI should be able to figure this out 
         /// automatically, unless you are building multiple mods from the 
         /// same directory
@@ -49,7 +49,7 @@ pub enum Project {
         package: Option<PathBuf>,
     },
 
-    /// Unpublish a project from the Geode mods index
+    /// Unpublish a project from the Sapphire mods index
     Unpublish {
         /// ID of the mod to unpublish. If not provided, current opened project 
         /// is used
@@ -71,12 +71,12 @@ fn find_build_directory(root: &Path) -> Option<PathBuf> {
     }
 }
 
-/// Get the project's built .geode file. Path argument should point to the 
+/// Get the project's built . file. Path argument should point to the 
 /// directory with the project's mod.json
 pub fn get_built_package(root: &Path) -> Option<PathBuf> {
     let mod_info = try_parse_mod_info(root).ok()?;
-    let geode_pkg = find_build_directory(root)?.join(format!("{}.geode", mod_info.id));
-    geode_pkg.exists().then_some(geode_pkg)
+    let _pkg = find_build_directory(root)?.join(format!("{}.", mod_info.id));
+    _pkg.exists().then_some(_pkg)
 }
 
 fn clear_cache(dir: &Path) {
@@ -87,20 +87,20 @@ fn clear_cache(dir: &Path) {
 	let workdir = get_working_dir(&mod_info.id);
 	fs::remove_dir_all(workdir).nice_unwrap("Unable to remove cache directory");
 
-    // Remove cached .geode package
+    // Remove cached . package
     let dir = find_build_directory(dir);
     if let Some(dir) = dir {
         for file in fs::read_dir(&dir).nice_unwrap("Unable to read build directory") {
             let path = file.unwrap().path();
             let Some(ext) = path.extension() else { continue };
-            if ext == "geode" {
-                fs::remove_file(path).nice_unwrap("Unable to delete cached .geode package");
+            if ext == "" {
+                fs::remove_file(path).nice_unwrap("Unable to delete cached . package");
             }
         }
     }
     else {
         warn!(
-            "Unable to find cached .geode package, can't clear it. It might be \
+            "Unable to find cached . package, can't clear it. It might be \
             that this is not supported on the current platform, or that your \
             build directory has a different name"
         );
@@ -233,11 +233,11 @@ pub fn check_dependencies(
 	if !mod_info.dependencies.iter().all(|d| externals.contains_key(&d.id))
 		&& !dont_update_index
 	{
-		info!("Updating Geode mods index");
+		info!("Updating Sapphire mods index");
 		update_index(config);
 	}
 
-	let dep_dir = output.join("geode-deps");
+	let dep_dir = output.join("-deps");
 	fs::create_dir_all(&dep_dir).nice_unwrap("Unable to create dependency directory");
 
 	// check all dependencies
@@ -299,7 +299,7 @@ pub fn check_dependencies(
 					If this is a mod that hasn't been published yet, install it \
 					locally first, or if it's a closed-source mod that won't be \
 					on the index, mark it as external in your CMake using \
-					setup_geode_mod(... EXTERNALS {0}:{1})",
+					setup__mod(... EXTERNALS {0}:{1})",
 					dep.id, dep.version
 				);
 				errors = true;
@@ -362,13 +362,13 @@ pub fn check_dependencies(
 			continue;
 		}
 
-		let path_to_dep_geode;
-		let _geode_info;
+		let path_to_dep_;
+		let __info;
 		match (found_in_installed, found_in_index) {
 			(Found::Some(inst_path, inst_info), Found::Some(_, _)) => {
 				info!("Dependency '{}' found", dep.id);
-				path_to_dep_geode = inst_path;
-				_geode_info = inst_info;
+				path_to_dep_ = inst_path;
+				__info = inst_info;
 			}
 
 			(Found::Some(inst_path, inst_info), _) => {
@@ -382,11 +382,11 @@ pub fn check_dependencies(
 				info!(
 					"If '{0}' is a closed-source mod that won't be released on \
 					the index, mark it as external in your CMake with \
-					setup_geode_mod(... EXTERNALS {0}:{1})",
+					setup__mod(... EXTERNALS {0}:{1})",
 					dep.id, dep.version
 				);
-				path_to_dep_geode = inst_path;
-				_geode_info = inst_info;
+				path_to_dep_ = inst_path;
+				__info = inst_info;
 			}
 
 			(Found::Wrong(version), Found::Some(_, indx_info)) => {
@@ -407,11 +407,11 @@ pub fn check_dependencies(
 					(update '{}' => '{}')",
 					dep.id, version, indx_info.version
 				);
-				path_to_dep_geode = install_mod(
+				path_to_dep_ = install_mod(
 					config, &indx_info.id,
 					&VersionReq::parse(&format!("=={}", indx_info.version.to_string())).unwrap()
 				);
-				_geode_info = indx_info;
+				__info = indx_info;
 			}
 
 			(_, Found::Some(_, indx_info)) => {
@@ -419,11 +419,11 @@ pub fn check_dependencies(
 					"Dependency '{}' found on the index, installing (version '{}')",
 					dep.id, indx_info.version
 				);
-				path_to_dep_geode = install_mod(
+				path_to_dep_ = install_mod(
 					config, &indx_info.id,
 					&VersionReq::parse(&format!("={}", indx_info.version.to_string())).unwrap()
 				);
-				_geode_info = indx_info;
+				__info = indx_info;
 			}
 
 			_ => unreachable!()
@@ -439,22 +439,22 @@ pub fn check_dependencies(
 		// cause issues if the dependency has changes
 		// check if dependency already installed
 		// if let Found::Some(_, info) = found_in_deps {
-		// 	if info.version == geode_info.version {
+		// 	if info.version == _info.version {
 		// 		continue;
 		// 	}
 		// }
 
-		// unzip the whole .geode package because there's only like a few 
+		// unzip the whole . package because there's only like a few 
 		// extra files there aside from the lib, headers, and resources
-		zip::ZipArchive::new(fs::File::open(path_to_dep_geode).unwrap())
+		zip::ZipArchive::new(fs::File::open(path_to_dep_).unwrap())
 			.nice_unwrap("Unable to unzip")
 			.extract(dep_dir.join(&dep.id))
-			.nice_unwrap("Unable to extract geode package");
+			.nice_unwrap("Unable to extract  package");
 		
 		// add a note saying if the dependencey is required or not (for cmake to 
 		// know if to link or not)
 		fs::write(
-			dep_dir.join(dep.id).join("geode-dep-options.json"),
+			dep_dir.join(dep.id).join("-dep-options.json"),
 			format!(r#"{{ "required": {} }}"#,
 					if dep.importance == DependencyImportance::Required ||
 						dep.required.is_some() && dep.required.unwrap() { "true" } else { "false" })
@@ -471,10 +471,10 @@ pub fn check_dependencies(
 
 pub fn publish_project(_config: &Config, dir: &Path, package_path: Option<PathBuf>) {
     let pkg = package_path.or(get_built_package(dir)).nice_unwrap(
-	    	"Unable to find the project's .geode package - please try manually \
-	    	specifying the path to the project's built .geode package using \
+	    	"Unable to find the project's . package - please try manually \
+	    	specifying the path to the project's built . package using \
 	    	the `--package <path>` option.\nThis issue is likely caused by \
-	    	an outdated Geode SDK version (at least 1.0.0-beta.8 needed) or \
+	    	an outdated Sapphire SDK version (at least 1.0.0-beta.8 needed) or \
 	    	by building multiple projects from the same directory."
     );
 

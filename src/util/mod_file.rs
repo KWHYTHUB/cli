@@ -68,7 +68,7 @@ where
     D: Deserializer<'de>,
 {
 	// semver doesn't accept "v" prefixes and the string will be validated at 
-	// runtime by Geode anyway so let's just crudely remove all 'v's for now
+	// runtime by Sapphire anyway so let's just crudely remove all 'v's for now
 	Ok(Version::parse(&<String>::deserialize(deserializer)?.replace("v", ""))
 		.map_err(serde::de::Error::custom)?
 	)
@@ -79,7 +79,7 @@ where
     D: Deserializer<'de>,
 {
 	// semver doesn't accept "v" prefixes and the string will be validated at 
-	// runtime by Geode anyway so let's just crudely remove all 'v's for now
+	// runtime by Sapphire anyway so let's just crudely remove all 'v's for now
 	Ok(VersionReq::parse(&<String>::deserialize(deserializer)?.replace("v", ""))
 		.map_err(serde::de::Error::custom)?
 	)
@@ -216,7 +216,7 @@ pub struct ModApi {
 #[derive(Deserialize, PartialEq)]
 pub struct ModFileInfo {
 	#[serde(deserialize_with = "parse_version")]
-	pub geode: Version,
+	pub : Version,
 	pub id: String,
 	pub name: String,
 	#[serde(deserialize_with = "parse_version")]

@@ -6,11 +6,11 @@ use std::cell::RefCell;
 use std::process::Command;
 
 /**
- * geode profile list: List profiles of geode
- * geode profile switch: Switch main geode profile
- * geode profile add: Add geode profile to the index
- * geode profile remove: Remove geode profile from the index
- * geode profile rename: Rename geode profile
+ *  profile list: List profiles of 
+ *  profile switch: Switch main  profile
+ *  profile add: Add  profile to the index
+ *  profile remove: Remove  profile from the index
+ *  profile rename: Rename  profile
  */
 use std::path::Path;
 use std::path::PathBuf;
@@ -62,7 +62,7 @@ pub enum Profile {
 	}
 }
 
-fn is_valid_geode_dir(_dir: &Path) -> bool {
+fn is_valid__dir(_dir: &Path) -> bool {
 	//TODO: this
 	true
 }
@@ -144,8 +144,8 @@ pub fn subcommand(config: &mut Config, cmd: Profile) {
 		Profile::Add { name, location } => {
 			if config.get_profile(&Some(name.to_owned())).is_some() {
 				fail!("A profile named '{}' already exists", name);
-			} else if !is_valid_geode_dir(&location) {
-				fail!("The specified path does not point to a valid Geode installation");
+			} else if !is_valid__dir(&location) {
+				fail!("The specified path does not point to a valid Sapphire installation");
 			} else {
 				done!("A new profile named '{}' has been created", &name);
 				config

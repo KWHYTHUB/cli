@@ -12,15 +12,15 @@ jobs:
         config:
         - name: "Windows"
           os: windows-latest
-          out_paths: './build/release/geode.exe'
+          out_paths: './build/release/.exe'
           static: ''
         - name: "macOS"
           os: macos-latest
-          out_paths: './build/release/geode'
+          out_paths: './build/release/'
           static: 'export OPENSSL_STATIC=1'
         - name: "linux"
           os: ubuntu-latest
-          out_paths: './build/release/geode'
+          out_paths: './build/release/'
           static: ''
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}

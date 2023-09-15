@@ -59,17 +59,17 @@ pub struct Entry {
 pub fn update_index(config: &Config) {
 	let index_dir = config.get_current_profile().index_dir();
 	
-	let target_index_dir = index_dir.join("geode-sdk_mods");
+	let target_index_dir = index_dir.join("sapphire_mods");
 	// note to loader devs: never change the format pretty please
-	let checksum = index_dir.join("geode-sdk_mods.checksum");
+	let checksum = index_dir.join("sapphire_mods.checksum");
 	let current_sha = fs::read_to_string(&checksum).unwrap_or(String::new());
 
 	let client = reqwest::blocking::Client::new();
 
-	let response = client.get("https://api.github.com/repos/geode-sdk/mods/commits/main")
+	let response = client.get("https://api.github.com/repos/KWHYTHUB/mods/commits/main")
 		.header("Accept", "application/vnd.github.sha")
 		.header("If-None-Match", format!("\"{}\"", current_sha))
-		.header(USER_AGENT, "GeodeCli")
+		.header(USER_AGENT, "SapphireCli")
 		.header(AUTHORIZATION, std::env::var("GITHUB_TOKEN").map_or("".into(), |token| format!("Bearer {token}")))
 		.send()
 		.nice_unwrap("Unable to fetch index version");
@@ -83,7 +83,7 @@ pub fn update_index(config: &Config) {
 
 	let mut zip_data = io::Cursor::new(Vec::new());
 
-	client.get("https://github.com/geode-sdk/mods/zipball/main")
+	client.get("https://github.com/KWHYTHUB/mods/zipball/main")
 		.send().nice_unwrap("Unable to download index")
 		.copy_to(&mut zip_data).nice_unwrap("Unable to write to index");
 
@@ -104,7 +104,7 @@ pub fn update_index(config: &Config) {
 		None
 	};
 
-	let extract_dir = std::env::temp_dir().join("geode-nuevo-index-zip");
+	let extract_dir = std::env::temp_dir().join("-nuevo-index-zip");
 	if extract_dir.exists() {
 		fs::remove_dir_all(&extract_dir).nice_unwrap("Unable to prepare new index");
 	}
@@ -149,7 +149,7 @@ pub fn update_index(config: &Config) {
 }
 
 pub fn index_mods_dir(config: &Config) -> PathBuf {
-	config.get_current_profile().index_dir().join("geode-sdk_mods").join("mods")
+	config.get_current_profile().index_dir().join("sapphire_mods").join("mods")
 }
 
 pub fn get_entry(config: &Config, id: &String, version: &VersionReq) -> Option<Entry> {
@@ -189,7 +189,7 @@ pub fn install_mod(config: &Config, id: &String, version: &VersionReq) -> PathBu
 		.bytes()
 		.nice_unwrap("Unable to download mod");
 	
-	let dest = config.get_current_profile().mods_dir().join(format!("{id}.geode"));
+	let dest = config.get_current_profile().mods_dir().join(format!("{id}."));
 
 	let mut hasher = Sha3_256::new();
 	hasher.update(&bytes);
@@ -201,12 +201,12 @@ pub fn install_mod(config: &Config, id: &String, version: &VersionReq) -> PathBu
 			    {hash}\n\
 			 vs {}\n\
 			Try again, and if the issue persists, report this on GitHub: \
-			https://github.com/geode-sdk/cli/issues/new",
+			https://github.com/KWHYTHUB/cli/issues/new",
 			entry.r#mod.hash
 		);
 	}
 
-	fs::write(&dest, bytes).nice_unwrap("Unable to install .geode file");
+	fs::write(&dest, bytes).nice_unwrap("Unable to install . file");
 
 	dest
 }
@@ -214,7 +214,7 @@ pub fn install_mod(config: &Config, id: &String, version: &VersionReq) -> PathBu
 fn create_index_json(path: &Path) {
 	let url = ask_value("URL", None, true);
 
-	let response = reqwest::blocking::get(&url).nice_unwrap("Unable to access .geode file at URL");
+	let response = reqwest::blocking::get(&url).nice_unwrap("Unable to access . file at URL");
 
 	let file_name = reqwest::Url::parse(&url).unwrap()
 		.path_segments()
@@ -224,7 +224,7 @@ fn create_index_json(path: &Path) {
 
 	let file_contents = response
 		.bytes()
-		.nice_unwrap("Unable to access .geode file at URL");
+		.nice_unwrap("Unable to access . file at URL");
 
 	let mut hasher = Sha3_256::new();
 	hasher.update(&file_contents);

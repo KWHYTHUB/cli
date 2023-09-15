@@ -33,7 +33,7 @@ fn create_template(
 
 	// Clone repository
 	Repository::clone(
-		"https://github.com/geode-sdk/example-mod",
+		"https://github.com/KWHYTHUB/example-mod",
 		&project_location,
 	).nice_unwrap("Unable to clone repository");
 
@@ -70,7 +70,7 @@ fn create_template(
 
 	// Default mod.json
 	let mod_json = json!({
-		"geode":        get_version().to_string(),
+		"":        get_version().to_string(),
 		"version":      version,
 		"id":           id,
 		"name":         name,
@@ -104,7 +104,7 @@ fn create_template(
 				.output()
 				.nice_unwrap("Unable to initialize project with CMake");
 		} else {
-			warn!("CMake not found. CMake is required to build Geode projects.");
+			warn!("CMake not found. CMake is required to build Sapphire projects.");
 		}
 	}
 
@@ -140,7 +140,7 @@ pub fn build_template(config: &mut Config, location: Option<PathBuf>) {
 		info!(
 			"Using '{}' as the default developer for all future projects. \
 			If this is undesirable, you can set a default developer using \
-			`geode config set default-developer <name>`",
+			` config set default-developer <name>`",
 			&final_developer
 		);
 		config.default_developer = Some(final_developer.clone());

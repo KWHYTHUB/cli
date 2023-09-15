@@ -1,4 +1,4 @@
-use crate::config::{geode_root};
+use crate::config::{_root};
 use crate::util::logging::ask_value;
 use std::fs;
 use std::path::PathBuf;
@@ -24,14 +24,14 @@ fn reset_and_commit(repo: &Repository, msg: &str) {
 	index.add_all(["."].iter(), IndexAddOption::DEFAULT, None).nice_unwrap("Unable to add changes");
 	index.write().nice_unwrap("Unable to write changes");
 
-	let sig = Signature::now("GeodeBot", "hjfodgames@gmail.com").unwrap();
+	let sig = Signature::now("SapphireBot", "hjfodgames@gmail.com").unwrap();
 
 	let tree = repo.find_tree(index.write_tree().nice_unwrap("Unable to get write tree")).unwrap();
 	repo.commit(Some("HEAD"), &sig, &sig, msg, &tree, &[&commit]).nice_unwrap("Unable to commit");
 }
 
 pub fn indexer_path() -> PathBuf {
-	geode_root().join("indexer")
+	_root().join("indexer")
 }
 
 pub fn is_initialized() -> bool {
@@ -45,7 +45,7 @@ pub fn initialize() {
 	}
 
 	info!(
-		"Before publishing mods on the Geode index, we need to make you a local \
+		"Before publishing mods on the Sapphire index, we need to make you a local \
 		Indexer, which handles everything related to publishing mods."
 	);
 	info!(
@@ -54,7 +54,7 @@ pub fn initialize() {
 	);
 	info!(
 		"To get started, log in to Github using your account, and go to \
-		https://github.com/geode-sdk/indexer/fork to make a fork of the Indexer."
+		https://github.com/KWHYTHUB/indexer/fork to make a fork of the Indexer."
 	);
 
 	let fork_url = ask_value("Enter the URL of your fork", None, true);
@@ -65,7 +65,7 @@ pub fn initialize() {
 
 pub fn list_mods() {
 	if !is_initialized() {
-		fatal!("Indexer has not been set up - use `geode indexer init` to set it up");
+		fatal!("Indexer has not been set up - use ` indexer init` to set it up");
 	}
 
 	println!("Published mods:");
@@ -73,7 +73,7 @@ pub fn list_mods() {
 	for dir in fs::read_dir(indexer_path()).unwrap() {
 		let path = dir.unwrap().path();
 
-		if path.is_dir() && path.join("mod.geode").exists() {
+		if path.is_dir() && path.join("mod.").exists() {
 			println!("    - {}", path.file_name().unwrap().to_str().unwrap().bright_green());
 		}
 	}
@@ -81,7 +81,7 @@ pub fn list_mods() {
 
 pub fn remove_mod(id: String) {
 	if !is_initialized() {
-		fatal!("Indexer has not been set up - use `geode indexer init` to set it up");
+		fatal!("Indexer has not been set up - use ` indexer init` to set it up");
 	}
 	let indexer_path = indexer_path();
 
@@ -102,7 +102,7 @@ pub fn remove_mod(id: String) {
 
 pub fn add_mod(package: PathBuf) {
 	if !is_initialized() {
-		fatal!("Indexer has not been set up - use `geode indexer init` to set it up");
+		fatal!("Indexer has not been set up - use ` indexer init` to set it up");
 	}
 	let indexer_path = indexer_path();
 
@@ -139,8 +139,8 @@ pub fn add_mod(package: PathBuf) {
 			.nice_unwrap("Unable to create directory in local indexer for mod");
 	}
 
-	fs::copy(package, mod_path.join("mod.geode"))
-		.nice_unwrap("Unable to copy .geode package to local Indexer");
+	fs::copy(package, mod_path.join("mod."))
+		.nice_unwrap("Unable to copy . package to local Indexer");
 
 	let repo = Repository::open(&indexer_path)
 			.nice_unwrap("Unable to open local Indexer repository");
@@ -166,7 +166,7 @@ pub fn add_mod(package: PathBuf) {
 		info!(
 			"To let us know you're ready to publish your mod, please open \
 			a Pull Request on your repository: \
-			{}/compare/geode-sdk:indexer:main...main",
+			{}/compare/KWHYTHUB:indexer:main...main",
 			url
 		);
 	}
